@@ -13,7 +13,9 @@ router.get('/:code', async (req, res, next) => {
     const { code } = req.params;
     const results = await db.query(`SELECT * FROM companies WHERE code = $1`, [code])
     const invoices = await db.query(`SELECT id FROM invoices WHERE comp_code = $1`, [code])
-    return res.json({ company: results.rows[0], invoices: invoices.rows })
+    const industries = await db.query(`SELECT industry FROM industries JOIN company_industries ON industries.
+    code = company_industries.industry_code WHERE company_industries.company_code =$1`, [code])
+    return res.json({ company: results.rows[0], invoices: invoices.rows.map(i => i.id), industries:industries.rows.map(i => i.industry) })
 })
 
 router.post('/', async (req, res, next) => {
@@ -27,9 +29,7 @@ router.post('/', async (req, res, next) => {
 
 
 router.put('/:code', async (req, res, next) => {
-    console.log('******************You hit put route****************************************************')
-    console.log(req.body)
-    console.log(req.params)
+
     try {
         let { name, description } = req.body;
         let { code } = req.params;

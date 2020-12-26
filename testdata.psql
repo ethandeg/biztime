@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS biztime;
-CREATE DATABASE biztime;
+DROP DATABASE IF EXISTS biztime_test;
+CREATE DATABASE biztime_test;
 
-\c biztime
+\c biztime_test
 
 
 CREATE TABLE companies (
@@ -30,24 +30,3 @@ CREATE TABLE company_industries (
   industry_code text NOT NULL REFERENCES industries ON DELETE CASCADE,
   company_code text NOT NULL REFERENCES companies ON DELETE CASCADE
 );
-
-INSERT INTO companies
-  VALUES ('apple', 'Apple Computer', 'Maker of OSX.'),
-         ('ibm', 'IBM', 'Big blue.');
-
-INSERT INTO invoices (comp_Code, amt, paid, paid_date)
-  VALUES ('apple', 100, false, null),
-         ('apple', 200, false, null),
-         ('apple', 300, true, '2018-01-01'),
-         ('ibm', 400, false, null);
-INSERT INTO industries(code, industry)
-VAlUES('R&D', 'Research and Development'),
-      ('fin', 'Financial'),
-      ('mktg', 'Marketing');
-
-INSERT INTO company_industries(industry_code, company_code)
-VALUES ('R&D', 'apple'),
-('R&D', 'ibm'),
- ('mktg', 'ibm'),
- ('fin', 'ibm'),
- ('mktg', 'apple');
