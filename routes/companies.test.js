@@ -18,7 +18,7 @@ beforeEach(async () => {
   testIndustry = industry.rows[0]
   await db.query(`INSERT INTO company_industries(industry_code, company_code)
   VALUES ('mktg', 'fgl')`)
-  console.log(testIndustry)
+
 })
 
 afterEach(async () => {
@@ -44,51 +44,39 @@ describe("GET /companies/:code", () => {
   test("get single company data", async () => {
     const res = await request(app).get('/companies/fgl')
     expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual({company: testCompany, invoices: [testInvoice], industries: [testIndustry.industry]})
+    expect(res.body).toEqual({company: testCompany, invoices: [testInvoice.id], industries: [testIndustry.industry]})
+  })
+  test("get a 404 when searching for wrong company code", async () => {
+    const res = await request(app).get('/companies/blank')
+    expect(res.statusCode).toBe(404)
   })
 })
 
-// describe("GET /users/:id", () => {
-//   test("Gets a single user", async () => {
-//     const res = await request(app).get(`/users/${testUser.id}`)
-//     expect(res.statusCode).toBe(200);
-//     expect(res.body).toEqual({ user: testUser })
-//   })
-//   test("Responds with 404 for invalid id", async () => {
-//     const res = await request(app).get(`/users/0`)
-//     expect(res.statusCode).toBe(404);
-//   })
-// })
+describe("POST /", () => {
+  test("create a new company", async () => {
+    const res = await request(app).post('/companies').send({code: "msft", name: "Microsoft", description: "A technology company"})
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toEqual({company: {code: "msft", name: "Microsoft", description: "A technology company"}})
+  })
+})
 
-// describe("POST /users", () => {
-//   test("Creates a single user", async () => {
-//     const res = await request(app).post('/users').send({ name: 'BillyBob', type: 'staff' });
-//     expect(res.statusCode).toBe(201);
-//     expect(res.body).toEqual({
-//       user: { id: expect.any(Number), name: 'BillyBob', type: 'staff' }
-//     })
-//   })
-// })
+describe("PUT /:code", async () => {
+  test("Update an existing company", async () => {
+    const res = await request(app).put("/companies/fgl").send({name: "Foreground Leads LLC", description: "A great digital marketing company"})
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({company: {code: "fgl", name: "Foreground Leads LLC", description: "A great digital marketing company"}})
+  })
+})
 
-// describe("PATCH /users/:id", () => {
-//   test("Updates a single user", async () => {
-//     const res = await request(app).patch(`/users/${testUser.id}`).send({ name: 'BillyBob', type: 'admin' });
-//     expect(res.statusCode).toBe(200);
-//     expect(res.body).toEqual({
-//       user: { id: testUser.id, name: 'BillyBob', type: 'admin' }
-//     })
-//   })
-//   test("Responds with 404 for invalid id", async () => {
-//     const res = await request(app).patch(`/users/0`).send({ name: 'BillyBob', type: 'admin' });
-//     expect(res.statusCode).toBe(404);
-//   })
-// })
-// describe("DELETE /users/:id", () => {
-//   test("Deletes a single user", async () => {
-//     const res = await request(app).delete(`/users/${testUser.id}`);
-//     expect(res.statusCode).toBe(200);
-//     expect(res.body).toEqual({ msg: 'DELETED!' })
-//   })
-// })
+
+describe("DELETE /:code", () => {
+  test("delete a company from db", async () => {
+    const res = await request(app).delete("/companies/fgl")
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toEqual({message: 'DELETED'})
+  })
+})
+
+
 
 
